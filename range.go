@@ -12,7 +12,7 @@ type Range struct {
 
 type StartPosition func(Database) (mysql.Position, error)
 
-type Predicate func(*Event) (bool, error)
+type Predicate func(*Event) bool
 
 type Event struct {
 	*replication.BinlogEvent
@@ -30,12 +30,12 @@ func Latest(db Database) (mysql.Position, error) {
 }
 
 func EndAfter(end mysql.Position) Predicate {
-	return func(event *Event) (bool, error) {
+	return func(event *Event) bool {
 		current := event.Position
-		return end.Name == current.Name && current.Pos >= end.Pos, nil
+		return end.Name == current.Name && current.Pos >= end.Pos
 	}
 }
 
-func NeverEnd(event *Event) (bool, error) {
-	return false, nil
+func NeverEnd(event *Event) bool {
+	return false
 }
